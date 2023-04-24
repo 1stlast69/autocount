@@ -1,46 +1,27 @@
-name: Autocount
+name: Run count.py every minute
 
-on: 
-  release:
-    types: [published]
+on:
   push:
-    tags:
-    - 'v*'
-  #  branches: 
-  #    - master
+    branches: [main] # change this to match your main branch name
+  pull_request:
+    branches: [main] # change this to match your main branch name
   schedule:
-    - cron: "* * * * *"
-  watch:
-    types: [started]
-   
-  jobs:
-   build:
+    - cron: "*/1 * * * *"
+
+jobs:
+  build:
     runs-on: ubuntu-latest
-    if: (github.event.repository.owner.id == github.event.sender.id) || ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}  # Self-ordered start
-    #if: github.event.repository.owner.id == github.event.sender.id  # Self-ordered start
-    name: Build and call API
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        persist-credentials: true # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
-        fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
-    - name: Set up Python #Install python
-      uses: actions/setup-python@v4
+      uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
       with:
         python-version: 3.9
-        check-latest: true
-    - name: Install requests #Installation requests
+    - name: Install dependencies
       run: |
-        pip install requests
-        - name: Test Api #ApiCall
-      run: | 
-        echo `date +"%Y-%m-%d %H:%M:%S"` begin > time.log
-        python3 count.py
-        
-     - name: Push changes
-      uses: ad-m/github-push-action@v0.6.0
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.ref }}
-        #force_with_lease: true
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Run count.py
+      run: |
+        python count.py
