@@ -13,8 +13,8 @@ on:
   watch:
     types: [started]
    
-jobs:
-  build:
+  jobs:
+   build:
     runs-on: ubuntu-latest
     if: (github.event.repository.owner.id == github.event.sender.id) || ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}  # Self-ordered start
     #if: github.event.repository.owner.id == github.event.sender.id  # Self-ordered start
